@@ -1,0 +1,19 @@
+package com.chat_service.memberChatroom.repository;
+
+import com.chat_service.chatroom.entity.Chatroom;
+import com.chat_service.member.entity.Member;
+import com.chat_service.memberChatroom.entity.MemberChatroom;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface MemberChatroomRepository extends JpaRepository<MemberChatroom, Long> {
+    Boolean existsByMemberAndChatroom(Member member, Chatroom chatroom);
+    void deleteByMemberAndChatroom(Member member, Chatroom chatroom);
+
+    List<MemberChatroom> findByMember_MemberId(Long memberId);
+
+    Optional<MemberChatroom> findByMember_MemberIdAndChatroom_ChatroomId(Long memberId, Long currentChatroomId);
+}

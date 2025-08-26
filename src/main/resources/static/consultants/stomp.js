@@ -84,7 +84,7 @@ function showChatrooms() {
   $.ajax({
     type: 'GET',
     dataType: 'json',
-    url: '/chats/1',
+    url: '/consultants/chats/1',
     success: function (data) {
       console.log('data: ', data);
       renderChatrooms(data);
