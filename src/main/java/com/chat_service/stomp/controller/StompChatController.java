@@ -4,6 +4,8 @@ import com.chat_service.chatroom.service.ChatroomService;
 import com.chat_service.member.entity.Member;
 import com.chat_service.member.service.MemberService;
 import com.chat_service.stomp.dto.ChatMessage;
+import com.chat_service.stomp.dto.ChatNotification;
+import java.security.Principal;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,17 +29,22 @@ public class StompChatController {
     @MessageMapping("/chats/{chatroomId}")
     // /sub/chats으로 메시지 전달
     @SendTo("/sub/chats/{chatroomId}")
-    public ChatMessage handleMessage(@DestinationVariable Long chatroomId, @Payload Map<String, String> payload) {
-        Member member = memberService.findById(1L);
-        String nickName = member.getNickName();
+    public ChatMessage handleMessage(Principal principal, @DestinationVariable Long chatroomId,
+            @Payload Map<String, String> payload) {
 
-        chatroomService.saveMessage(1L, chatroomId, payload.get("message"));
+        String userId = principal.getName();
+        Member member = memberService.findByUserId(userId);
 
-        log.info("{}} sent {} in {}", nickName, payload , chatroomId);
+        log.info("{} sent {} in {}", userId, payload, chatroomId);
+
+        chatroomService.saveMessage(member.getMemberId(), chatroomId, payload.get("message"));
 
         //새로운 메시지 발행
-        messagingTemplate.convertAndSend("/sub/chats/news", chatroomId);
+        messagingTemplate.convertAndSend(
+                "/sub/chats/news"
+                , ChatNotification.of(userId, chatroomId)
+        );
 
-        return new ChatMessage(nickName, payload.get("message"));
+        return new ChatMessage(userId, payload.get("message"));
     }
 }

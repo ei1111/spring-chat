@@ -29,7 +29,7 @@ public class MemberChatroomSerivce {
         memberChatroomRepository.deleteByMemberAndChatroom(member, chatroom);
     }
 
-    public List<MemberChatroom> findAllByMemberId(Long memberId) {
-        return memberChatroomRepository.findByMember_MemberId(memberId);
+    public List<MemberChatroom> findAllByUserId(String userId) {
+        return memberChatroomRepository.findByMember_UserId(userId);
     }
 }

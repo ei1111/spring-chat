@@ -25,12 +25,19 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberId;
 
+    @Comment("아이디")
+    @Column(nullable = false, unique = true)
+    private String userId;
+
+    @Comment("비밀번호")
+    private String password;
+
     @Comment("이메일")
     @Column(nullable = false, unique = true)
     private String email;
 
     @Comment("이름")
-    private String nickName;
+    private String name;
 
     @Comment("성별")
     @Enumerated(EnumType.STRING)
@@ -45,19 +52,17 @@ public class Member {
     @Comment("직책")
     private String role;
 
-    @Comment("비밀번호")
-    private String password;
-
     @Builder
-    public Member(String email, String nickName, Gender gender, String phoneNumber,
-            LocalDate birthDate, String role, String password) {
+    public Member(String userId, String password, String email, String name, Gender gender,
+            String phoneNumber, LocalDate birthDate, String role) {
+        this.userId = userId;
+        this.password = password;
         this.email = email;
-        this.nickName = nickName;
+        this.name = name;
         this.gender = gender;
         this.phoneNumber = phoneNumber;
         this.birthDate = birthDate;
         this.role = role;
-        this.password = password;
     }
 
     public Role getRole() {
@@ -67,8 +72,9 @@ public class Member {
     public MemberResponse toResponse() {
         return MemberResponse.builder()
                 .memberId(this.memberId)
+                .userId(this.userId)
+                .name(this.name)
                 .email(this.email)
-                .nickName(this.nickName)
                 .gender(this.gender)
                 .phoneNumber(this.phoneNumber)
                 .birthDate(this.birthDate)

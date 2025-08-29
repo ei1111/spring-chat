@@ -13,7 +13,7 @@ public interface MemberChatroomRepository extends JpaRepository<MemberChatroom, 
     Boolean existsByMemberAndChatroom(Member member, Chatroom chatroom);
     void deleteByMemberAndChatroom(Member member, Chatroom chatroom);
 
-    List<MemberChatroom> findByMember_MemberId(Long memberId);
+    List<MemberChatroom> findByMember_UserId(String userId);
 
     Optional<MemberChatroom> findByMember_MemberIdAndChatroom_ChatroomId(Long memberId, Long currentChatroomId);
 }

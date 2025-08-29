@@ -1,5 +1,6 @@
 const stompClient = new StompJs.Client({
-  brokerURL: 'ws://localhost:8080/stomp/chats'
+  // brokerURL 대신 SockJS 연결
+  webSocketFactory: () => new SockJS('http://localhost:8080/stomp/chats'),
 });
 
 stompClient.onConnect = (frame) => {

@@ -1,15 +1,44 @@
 const stompClient = new StompJs.Client({
-  brokerURL: 'ws://localhost:8080/stomp/chats'
+  // brokerURL 대신 SockJS 연결
+  webSocketFactory: () => new SockJS('http://localhost:8080/stomp/chats'),
 });
+let userId;
 
+function getCurrentUser(callback) {
+  $.ajax({
+    type: 'GET',
+    url: '/consultants/me',
+    xhrFields: { withCredentials: true }, // 쿠키 포함
+    success: function(data) {
+      userId = data.userId;
+      callback(data.userId);
+    },
+    error: function(err) {
+      console.error('Failed to get current user', err);
+    }
+  });
+}
+
+// 2. 연결 시 처리
 stompClient.onConnect = (frame) => {
-  setConnected(true);
-  showChatrooms();
-  stompClient.subscribe('/sub/chats/news',
-      (chatMessage) => {
-        toggleNewMessageIcon(JSON.parse(chatMessage.body), true);
-      });
   console.log('Connected: ' + frame);
+  setConnected(true);
+
+  getCurrentUser((userId) => {
+    console.log('Logged in user:', userId);
+  showChatrooms(userId);
+  });
+
+  // 3. 새로운 메시지 알림 구독
+  stompClient.subscribe('/sub/chats/news', (chatMessage) => {
+    const notification = JSON.parse(chatMessage.body);
+
+    // 새 메시지 아이콘 표시
+    toggleNewMessageIcon(notification.chatroomId, true);
+
+    // 메시지 보낸 유저 기준으로 채팅방 목록 갱신
+    showChatrooms(notification.userId);
+  });
 };
 
 function toggleNewMessageIcon(chatroomId, toggle) {
@@ -47,7 +76,6 @@ function disconnect() {
 }
 
 function sendMessage() {
-  console.log("sendMessage");
   let chatroomId = $("#chatroom-id").val();
   stompClient.publish({
     destination: "/pub/chats/" + chatroomId,
@@ -58,7 +86,6 @@ function sendMessage() {
 }
 
 function createChatroom() {
-  console.log("createChatroom");
   $.ajax({
     type: 'POST',
     url: '/chats',
@@ -79,12 +106,11 @@ function createChatroom() {
   })
 }
 
-function showChatrooms() {
-  console.log("showChatrooms");
+function showChatrooms(userId) {
   $.ajax({
     type: 'GET',
     dataType: 'json',
-    url: '/chats/1',
+    url: '/chats/'+ userId,
     success: function (data) {
       console.log('data: ', data);
       renderChatrooms(data);
@@ -111,7 +137,6 @@ function renderChatrooms(chatrooms) {
 }
 
 function getDisplayValue(hasNewMessage) {
-  console.log("getDisplayValue");
   if (hasNewMessage) {
     return "inline";
   }
@@ -143,8 +168,7 @@ function enterChatroom(chatroomId, newMember) {
   if (newMember) {
     stompClient.publish({
       destination: "/pub/chats/" + chatroomId,
-      body: JSON.stringify(
-          {'message': "님이 방에 들어왔습니다."})
+      body: JSON.stringify({ [userId]: "님이 방에 들어왔습니다." })
     })
   }
 }
@@ -168,8 +192,10 @@ function showMessages(chatroomId) {
 }
 
 function showMessage(chatMessage) {
+  const sender = chatMessage.sender || userId;
+  const message = chatMessage.message || "님이 방에 들어왔습니다.";
   $("#messages").append(
-      "<tr><td>" + chatMessage.sender + " : " + chatMessage.message
+      "<tr><td>" + sender + " : " + message
       + "</td></tr>");
 }
 

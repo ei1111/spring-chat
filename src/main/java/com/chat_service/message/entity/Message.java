@@ -49,7 +49,7 @@ public class Message {
 
     public MessageResponse toResponse() {
         return MessageResponse.builder()
-                .sender(member.getNickName())
+                .sender(member.getName())
                 .message(text)
                 .build();
     }

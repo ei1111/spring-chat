@@ -1,10 +1,8 @@
-package com.chat_service.formLogin.userDetail;
+package com.chat_service.consultant.userDetail;
 
 import com.chat_service.member.entity.Member;
-import com.chat_service.member.repository.MemberRepository;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,6 +27,6 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return member.getNickName();
+        return member.getUserId();
     }
 }

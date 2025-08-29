@@ -43,10 +43,11 @@ public class ChatroomController {
         chatroomService.leaveChatroom(request);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<List<ChatroomResponse>> findChatrooms(@PathVariable Long id) {
-        return ResponseEntity.ok().body(chatroomService.getChatroomList(id));
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<ChatroomResponse>> findChatrooms(@PathVariable String userId) {
+        return ResponseEntity.ok().body(chatroomService.getChatroomList(userId));
     }
+
 
     @GetMapping("/{chatroomId}/messages")
     public ResponseEntity<List<MessageResponse>> getMessageList(@PathVariable Long chatroomId) {

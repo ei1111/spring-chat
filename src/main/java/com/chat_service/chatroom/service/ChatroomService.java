@@ -98,8 +98,8 @@ public class ChatroomService {
     }
 
     //등록된 채팅방 조회
-    public List<ChatroomResponse> getChatroomList(Long memberId) {
-        return memberChatroomSerivce.findAllByMemberId(memberId).stream()
+    public List<ChatroomResponse> getChatroomList(String userId) {
+        return memberChatroomSerivce.findAllByUserId(userId).stream()
                 .map(memberChatroom -> {
                     Chatroom chatroom = memberChatroom.getChatroom();
                     chatroom.setHasNewMessages(

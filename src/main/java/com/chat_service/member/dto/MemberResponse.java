@@ -15,9 +15,11 @@ public class MemberResponse {
 
     private Long memberId;
 
+    private String userId;
+
     private String email;
 
-    private String nickName;
+    private String name;
 
     private Gender gender;
 
@@ -28,11 +30,13 @@ public class MemberResponse {
     private Role role;
 
     @Builder
-    public MemberResponse(Long memberId, String email, String nickName, Gender gender,
+
+    public MemberResponse(Long memberId, String userId, String email, String name, Gender gender,
             String phoneNumber, LocalDate birthDate, Role role) {
         this.memberId = memberId;
+        this.userId = userId;
         this.email = email;
-        this.nickName = nickName;
+        this.name = name;
         this.gender = gender;
         this.phoneNumber = phoneNumber;
         this.birthDate = birthDate;
