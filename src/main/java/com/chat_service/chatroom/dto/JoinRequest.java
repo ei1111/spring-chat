@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class JoinRequest {
-    private Long memberId;
+    private String userId;
     private Long chatroomId;
     private Long currentChatroomId;
 }

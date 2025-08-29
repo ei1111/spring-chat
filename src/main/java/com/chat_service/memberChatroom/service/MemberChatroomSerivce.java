@@ -6,6 +6,8 @@ import com.chat_service.memberChatroom.entity.MemberChatroom;
 import com.chat_service.memberChatroom.repository.MemberChatroomRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,5 +33,9 @@ public class MemberChatroomSerivce {
 
     public List<MemberChatroom> findAllByUserId(String userId) {
         return memberChatroomRepository.findByMember_UserId(userId);
+    }
+
+    public Page<MemberChatroom> findAllByUserIdPage(Member member, Pageable pageable) {
+        return memberChatroomRepository.findAllByMember(member, pageable);
     }
 }

@@ -56,7 +56,7 @@ public class Chatroom {
                 .id(this.chatroomId)
                 .title(this.title)
                 .createdAt(this.createdAt)
-                .memberCount(memberChatrooms.size())
+                .memberCount(this.memberChatrooms.size())
                 .hasNewMessages(hasNewMessages)
                 .build();
     }

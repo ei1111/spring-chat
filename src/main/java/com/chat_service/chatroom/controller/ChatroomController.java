@@ -11,6 +11,9 @@ import com.chat_service.message.dto.MessageResponse;
 import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
@@ -20,6 +23,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -43,10 +48,19 @@ public class ChatroomController {
         chatroomService.leaveChatroom(request);
     }
 
-    @GetMapping("/{userId}")
+/*    @GetMapping("/{userId}")
     public ResponseEntity<List<ChatroomResponse>> findChatrooms(@PathVariable String userId) {
         return ResponseEntity.ok().body(chatroomService.getChatroomList(userId));
+    }*/
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<Page<ChatroomResponse>> findChatrooms(@PathVariable String userId, Pageable pageable) {
+        // 무조건 size=10 으로 제한
+        Pageable fixedPageable = PageRequest.of(pageable.getPageNumber(), 10, pageable.getSort());
+
+        return ResponseEntity.ok().body(chatroomService.getChatroomPage(userId, fixedPageable));
     }
+
 
 
     @GetMapping("/{chatroomId}/messages")

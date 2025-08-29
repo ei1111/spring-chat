@@ -20,7 +20,7 @@ import org.hibernate.annotations.Comment;
 @Setter
 @NoArgsConstructor
 public class ChatroomRequest {
-    private Long memberId;
+    private String userId;
     private String title;
 
     public Chatroom toChatroomEntity() {

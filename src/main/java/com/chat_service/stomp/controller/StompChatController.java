@@ -38,7 +38,6 @@ public class StompChatController {
         log.info("{} sent {} in {}", userId, payload, chatroomId);
 
         chatroomService.saveMessage(member.getMemberId(), chatroomId, payload.get("message"));
-
         //새로운 메시지 발행
         messagingTemplate.convertAndSend(
                 "/sub/chats/news"

@@ -2,6 +2,7 @@ package com.chat_service.chatroom.dto;
 
 import com.chat_service.memberChatroom.dto.MemberChatroomResponse;
 import com.chat_service.memberChatroom.entity.MemberChatroom;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -25,6 +26,8 @@ public class ChatroomResponse {
     private String title;
     private Integer memberCount;
     private Boolean hasNewMessages;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
     @Builder

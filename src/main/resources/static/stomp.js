@@ -91,7 +91,7 @@ function createChatroom() {
     url: '/chats',
     contentType: 'application/json',   // JSON 전송
     data: JSON.stringify({
-      memberId: 1,
+      userId: userId,
       title: $("#chatroom-title").val()
     }),
     success: function (data) {
@@ -121,7 +121,7 @@ function showChatrooms(userId) {
     },
   })
 }
-
+/*
 function renderChatrooms(chatrooms) {
   $("#chatroom-list").html("");
   for (let i = 0; i < chatrooms.length; i++) {
@@ -133,6 +133,36 @@ function renderChatrooms(chatrooms) {
         + chatrooms[i].memberCount + "</td><td>" + chatrooms[i].createdAt
         + "</td></tr>"
     );
+  }
+}*/
+
+function renderChatrooms(page) {
+  let chatrooms = page.content;
+  $("#chatroom-list").html("");
+  for (let i = 0; i < chatrooms.length; i++) {
+    $("#chatroom-list").append(
+        "<tr onclick='joinChatroom(" + chatrooms[i].id + ")'><td>"
+        + chatrooms[i].id + "</td><td>" + chatrooms[i].title
+        + "<img src='new.png' id='new_" + chatrooms[i].id + "' style='display: "
+        + getDisplayValue(chatrooms[i].hasNewMessage)
+        + "'/></td><td id='memberCount_" + chatrooms[i].id + "'>"
+        + chatrooms[i].memberCount + "</td><td>" + chatrooms[i].createdAt
+        + "</td></tr>"
+    );
+  }
+
+  if (page.first) {
+    $("#prev").prop("disabled", true);
+  } else {
+    $("#prev").prop("disabled", false).click(
+        () => showChatrooms(page.number - 1));
+  }
+
+  if (page.last) {
+    $("#next").prop("disabled", true);
+  } else {
+    $("#next").prop("disabled", false).click(
+        () => showChatrooms(page.number + 1));
   }
 }
 
@@ -166,9 +196,10 @@ function enterChatroom(chatroomId, newMember) {
       });
 
   if (newMember) {
+    console.log("newMember:", newMember);
     stompClient.publish({
       destination: "/pub/chats/" + chatroomId,
-      body: JSON.stringify({ [userId]: "님이 방에 들어왔습니다." })
+      body: JSON.stringify({ userId : "님이 방에 들어왔습니다." })
     })
   }
 }
@@ -193,7 +224,7 @@ function showMessages(chatroomId) {
 
 function showMessage(chatMessage) {
   const sender = chatMessage.sender || userId;
-  const message = chatMessage.message || "님이 방에 들어왔습니다.";
+  const message = chatMessage.message;
   $("#messages").append(
       "<tr><td>" + sender + " : " + message
       + "</td></tr>");
@@ -206,7 +237,7 @@ function joinChatroom(chatroomId) {
     url: '/chats/chatrooms',
     contentType: 'application/json',   // JSON 전송
     data: JSON.stringify({
-      memberId: 1,
+      userId: userId,
       chatroomId: chatroomId,
       currentChatroomId : $("#chatroom-id").val()
     }),
@@ -237,7 +268,7 @@ function leaveChatroom() {
     type: 'DELETE',
     url: '/chats',
     contentType: 'application/json',   // JSON 타입 지정
-    data: JSON.stringify({ chatroomId: chatroomId , memberId: 1}), // JSON 바디 전송
+    data: JSON.stringify({ chatroomId: chatroomId , userId: userId}), // JSON 바디 전송
     success: function (data) {
       console.log('data: ', data);
       showChatrooms();

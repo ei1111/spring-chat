@@ -7,6 +7,7 @@ import com.chat_service.chatroom.dto.LeaveRequest;
 import com.chat_service.chatroom.entity.Chatroom;
 import com.chat_service.chatroom.repository.ChatroomRepository;
 import com.chat_service.member.entity.Member;
+import com.chat_service.member.entity.Role;
 import com.chat_service.member.service.MemberService;
 import com.chat_service.memberChatroom.entity.MemberChatroom;
 import com.chat_service.memberChatroom.repository.MemberChatroomRepository;
@@ -17,6 +18,8 @@ import com.chat_service.message.entity.Message;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +38,7 @@ public class ChatroomService {
 
     @Transactional
     public ChatroomResponse createChatroom(ChatroomRequest chatroomRequest) {
-        Member member = memberService.findById(chatroomRequest.getMemberId());
+        Member member = memberService.findByUserId(chatroomRequest.getUserId());
 
         Chatroom chatroom = chatroomRequest.toChatroomEntity();
 
@@ -52,7 +55,7 @@ public class ChatroomService {
     //채팅방 참여
     @Transactional
     public boolean joinChartroom(JoinRequest joinRequest) {
-        Member member = memberService.findById(joinRequest.getMemberId());
+        Member member = memberService.findByUserId(joinRequest.getUserId());
         Chatroom chatroom = findById(joinRequest.getChatroomId());
 
         if (joinRequest.getCurrentChatroomId() != null) {
@@ -76,7 +79,7 @@ public class ChatroomService {
     //채팅방 떠나기
     @Transactional
     public boolean leaveChatroom(LeaveRequest leaveRequest) {
-        Member member = memberService.findById(leaveRequest.getMemberId());
+        Member member = memberService.findByUserId(leaveRequest.getUserId());
         Chatroom chatroom = findById(leaveRequest.getChatroomId());
 
         if (!memberChatroomSerivce.existsByMemberAndChatroom(member, chatroom)) {
@@ -97,23 +100,6 @@ public class ChatroomService {
                 });
     }
 
-    //등록된 채팅방 조회
-    public List<ChatroomResponse> getChatroomList(String userId) {
-        return memberChatroomSerivce.findAllByUserId(userId).stream()
-                .map(memberChatroom -> {
-                    Chatroom chatroom = memberChatroom.getChatroom();
-                    chatroom.setHasNewMessages(
-                            messageRepository.existsByChatroom_ChatroomIdAndCreatedAtAfter(
-                                    chatroom.getChatroomId(),
-                                    memberChatroom.getLastCheckedAt()
-                            )
-                    );
-                    return chatroom;
-                })
-                .map(Chatroom::toResponse)
-                .toList();
-
-    }
 
     //메세지 저장
     @Transactional
@@ -129,4 +115,57 @@ public class ChatroomService {
                 .map(Message::toResponse)
                 .toList();
     }
+
+    public Page<ChatroomResponse> getChatroomPage(String userId, Pageable pageable) {
+        Member member = memberService.findByUserId(userId);
+
+        if (member.getRole() == Role.ROLE_CONSULTANT) {
+            return getChatroomPage(pageable);
+        } else {
+            return getUserchatroomPage(member, pageable);
+        }
+    }
+
+    //등록된 채팅방 조회
+    public Page<ChatroomResponse> getUserchatroomPage(Member member, Pageable pageable) {
+        Page<MemberChatroom> pageMemberChatroom = memberChatroomSerivce.findAllByUserIdPage(member,
+                pageable);
+
+        return pageMemberChatroom.map(memberChatroom -> {
+            Chatroom chatroom = memberChatroom.getChatroom();
+            boolean hasNewMessages = messageRepository.existsByChatroom_ChatroomIdAndCreatedAtAfter(
+                    chatroom.getChatroomId(),
+                    memberChatroom.getLastCheckedAt()
+            );
+
+            chatroom.setHasNewMessages(hasNewMessages);
+            return chatroom.toResponse();
+        });
+    }
+
+    //모든 채팅룸 가져오기
+    public Page<ChatroomResponse> getChatroomPage(Pageable pageable) {
+        return chatroomRepository.findAll(pageable)
+                .map(Chatroom::toResponse);
+    }
+
+    //등록된 채팅방 조회
+ /*   public List<ChatroomResponse> getChatroomList(String userId) {
+        return memberChatroomSerivce.findAllByUserId(userId).stream()
+                .map(memberChatroom -> {
+                    Chatroom chatroom = memberChatroom.getChatroom();
+                    chatroom.setHasNewMessages(
+                            messageRepository.existsByChatroom_ChatroomIdAndCreatedAtAfter(
+                                    chatroom.getChatroomId(),
+                                    memberChatroom.getLastCheckedAt()
+                            )
+                    );
+                    return chatroom;
+                })
+                .map(Chatroom::toResponse)
+                .toList();
+
+    }*/
+
+
 }
