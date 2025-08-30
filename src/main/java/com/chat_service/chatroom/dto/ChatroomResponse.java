@@ -24,18 +24,18 @@ import org.hibernate.annotations.Comment;
 public class ChatroomResponse {
     private Long id;
     private String title;
-    private Integer memberCount;
+    private Integer chatCount;
     private Boolean hasNewMessages;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
     @Builder
-    public ChatroomResponse(Long id, String title, Integer memberCount, Boolean hasNewMessages,
+    public ChatroomResponse(Long id, String title, Integer chatCount, Boolean hasNewMessages,
             LocalDateTime createdAt) {
         this.id = id;
         this.title = title;
-        this.memberCount = memberCount;
+        this.chatCount = chatCount;
         this.hasNewMessages = hasNewMessages;
         this.createdAt = createdAt;
     }

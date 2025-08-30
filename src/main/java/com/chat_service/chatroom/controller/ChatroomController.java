@@ -48,11 +48,6 @@ public class ChatroomController {
         chatroomService.leaveChatroom(request);
     }
 
-/*    @GetMapping("/{userId}")
-    public ResponseEntity<List<ChatroomResponse>> findChatrooms(@PathVariable String userId) {
-        return ResponseEntity.ok().body(chatroomService.getChatroomList(userId));
-    }*/
-
     @GetMapping("/{userId}")
     public ResponseEntity<Page<ChatroomResponse>> findChatrooms(@PathVariable String userId, Pageable pageable) {
         // 무조건 size=10 으로 제한

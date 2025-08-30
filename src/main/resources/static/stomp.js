@@ -4,6 +4,7 @@ const stompClient = new StompJs.Client({
 });
 let userId;
 
+
 function getCurrentUser(callback) {
   $.ajax({
     type: 'GET',
@@ -26,7 +27,7 @@ stompClient.onConnect = (frame) => {
 
   getCurrentUser((userId) => {
     console.log('Logged in user:', userId);
-  showChatrooms(userId);
+  showChatrooms(userId, 0);
   });
 
   // 3. 새로운 메시지 알림 구독
@@ -37,7 +38,7 @@ stompClient.onConnect = (frame) => {
     toggleNewMessageIcon(notification.chatroomId, true);
 
     // 메시지 보낸 유저 기준으로 채팅방 목록 갱신
-    showChatrooms(notification.userId);
+    showChatrooms(notification.userId, 0);
   });
 };
 
@@ -96,7 +97,7 @@ function createChatroom() {
     }),
     success: function (data) {
       console.log('data: ', data);
-      showChatrooms();
+      showChatrooms(userId,0)
       enterChatroom(data.id, true);
     },
     error: function (request, status, error) {
@@ -106,11 +107,11 @@ function createChatroom() {
   })
 }
 
-function showChatrooms(userId) {
+function showChatrooms(userId, pageNumber) {
   $.ajax({
     type: 'GET',
     dataType: 'json',
-    url: '/chats/'+ userId,
+    url: '/chats/' + userId + '?page=' + pageNumber ,
     success: function (data) {
       console.log('data: ', data);
       renderChatrooms(data);
@@ -121,20 +122,6 @@ function showChatrooms(userId) {
     },
   })
 }
-/*
-function renderChatrooms(chatrooms) {
-  $("#chatroom-list").html("");
-  for (let i = 0; i < chatrooms.length; i++) {
-    $("#chatroom-list").append(
-        "<tr onclick='joinChatroom(" + chatrooms[i].id + ")'><td>"
-        + chatrooms[i].id + "</td><td>" + chatrooms[i].title
-        + "<img src='new.png' id='new_" + chatrooms[i].id + "' style='display: "
-        + getDisplayValue(chatrooms[i].hasNewMessage) + "'/></td><td>"
-        + chatrooms[i].memberCount + "</td><td>" + chatrooms[i].createdAt
-        + "</td></tr>"
-    );
-  }
-}*/
 
 function renderChatrooms(page) {
   let chatrooms = page.content;
@@ -146,23 +133,28 @@ function renderChatrooms(page) {
         + "<img src='new.png' id='new_" + chatrooms[i].id + "' style='display: "
         + getDisplayValue(chatrooms[i].hasNewMessage)
         + "'/></td><td id='memberCount_" + chatrooms[i].id + "'>"
-        + chatrooms[i].memberCount + "</td><td>" + chatrooms[i].createdAt
+        + chatrooms[i].chatCount + "</td><td>" + chatrooms[i].createdAt
         + "</td></tr>"
     );
   }
+
+  // 이전 페이지 버튼
+  $("#prev").off("click"); // 기존 이벤트 제거
 
   if (page.first) {
     $("#prev").prop("disabled", true);
   } else {
     $("#prev").prop("disabled", false).click(
-        () => showChatrooms(page.number - 1));
+        () => showChatrooms(userId,page.number - 1));
   }
 
+  // 다음 페이지 버튼
+  $("#next").off("click"); // 기존 이벤트 제거
   if (page.last) {
     $("#next").prop("disabled", true);
   } else {
     $("#next").prop("disabled", false).click(
-        () => showChatrooms(page.number + 1));
+        () => showChatrooms(userId, page.number + 1));
   }
 }
 
@@ -177,7 +169,6 @@ function getDisplayValue(hasNewMessage) {
 let subscription;
 
 function enterChatroom(chatroomId, newMember) {
-  console.log("enterChatroom");
   $("#chatroom-id").val(chatroomId);
   $("#messages").html("");
   showMessages(chatroomId);
@@ -223,15 +214,15 @@ function showMessages(chatroomId) {
 }
 
 function showMessage(chatMessage) {
+  console.log("chatMessage:", chatMessage);
   const sender = chatMessage.sender || userId;
-  const message = chatMessage.message;
+  const message = chatMessage.message || "님이 방에 들어왔습니다."
   $("#messages").append(
       "<tr><td>" + sender + " : " + message
       + "</td></tr>");
 }
 
 function joinChatroom(chatroomId) {
-
   $.ajax({
     type: 'POST',
     url: '/chats/chatrooms',
@@ -271,7 +262,7 @@ function leaveChatroom() {
     data: JSON.stringify({ chatroomId: chatroomId , userId: userId}), // JSON 바디 전송
     success: function (data) {
       console.log('data: ', data);
-      showChatrooms();
+      showChatrooms(userId,0);
       exitChatroom(chatroomId);
     },
     error: function (request, status, error) {

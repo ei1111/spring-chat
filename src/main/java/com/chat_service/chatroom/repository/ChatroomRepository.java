@@ -12,6 +12,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
-    @EntityGraph(attributePaths = "memberChatrooms") // memberChatrooms도 같이 조회
+    @EntityGraph(attributePaths = "messages") // messages도 같이 조회
     Page<Chatroom> findAll(Pageable pageable);
 }

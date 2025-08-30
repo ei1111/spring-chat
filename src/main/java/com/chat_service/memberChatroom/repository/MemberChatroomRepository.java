@@ -13,7 +13,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MemberChatroomRepository extends JpaRepository<MemberChatroom, Long> {
     Boolean existsByMemberAndChatroom(Member member, Chatroom chatroom);
-    void deleteByMemberAndChatroom(Member member, Chatroom chatroom);
+
+    void deleteByMember_MemberIdAndChatroom_ChatroomId(Long memberId, Long chatroomId);
 
     List<MemberChatroom> findByMember_UserId(String userId);
 

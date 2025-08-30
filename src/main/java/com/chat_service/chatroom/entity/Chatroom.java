@@ -2,6 +2,7 @@ package com.chat_service.chatroom.entity;
 
 import com.chat_service.chatroom.dto.ChatroomResponse;
 import com.chat_service.memberChatroom.entity.MemberChatroom;
+import com.chat_service.message.entity.Message;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -41,6 +42,10 @@ public class Chatroom {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "chatroom")
     private List<MemberChatroom> memberChatrooms = new ArrayList<>();
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "chatroom")
+    private List<Message> messages = new ArrayList<>();
+
+
     public void addChatroom(MemberChatroom memberChatroom) {
         memberChatrooms.add(memberChatroom);
     }
@@ -56,7 +61,7 @@ public class Chatroom {
                 .id(this.chatroomId)
                 .title(this.title)
                 .createdAt(this.createdAt)
-                .memberCount(this.memberChatrooms.size())
+                .chatCount(this.messages.size())
                 .hasNewMessages(hasNewMessages)
                 .build();
     }

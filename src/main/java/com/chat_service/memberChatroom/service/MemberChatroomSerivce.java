@@ -28,7 +28,7 @@ public class MemberChatroomSerivce {
 
     @Transactional
     public void leave(Member member,  Chatroom chatroom) {
-        memberChatroomRepository.deleteByMemberAndChatroom(member, chatroom);
+        memberChatroomRepository.deleteByMember_MemberIdAndChatroom_ChatroomId(member.getMemberId(), chatroom.getChatroomId());
     }
 
     public List<MemberChatroom> findAllByUserId(String userId) {

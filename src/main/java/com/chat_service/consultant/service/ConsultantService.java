@@ -20,16 +20,10 @@ import org.springframework.stereotype.Service;
 public class ConsultantService implements UserDetailsService {
 
     private final MemberService memberService;
-    private final ChatroomRepository chatroomRepository;
 
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
         return new CustomUserDetails(memberService.findByUserId(userId));
     }
 
-    //모든 채팅룸 가져오기
-    public Page<ChatroomResponse> getChatroomPage(Pageable pageable) {
-        return chatroomRepository.findAll(pageable)
-                .map(Chatroom::toResponse);
-    }
 }
