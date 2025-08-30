@@ -1,11 +1,7 @@
 package com.chat_service.config;
 
-import lombok.Builder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,12 +10,18 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfiguration {
 
+    private static final String[] AUTH_ALLOWLIST = {
+            "/swagger-ui/**", "/v3/**", "/login/**", "/images/**", "/css/**", "/js/**",
+            "/login.html"
+    };
+
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 // 정적 리소스와 login.html은 인증 없이 접근 허용
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login.html", "/css/**", "/js/**").permitAll()
+                        .requestMatchers(AUTH_ALLOWLIST).permitAll()
                         .anyRequest().authenticated() // 나머지는 인증 필요
                 )
                 // 커스텀 로그인 페이지 지정

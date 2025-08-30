@@ -1,5 +1,7 @@
 package com.chat_service.consultant.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequiredArgsConstructor
+@Tag(name = "3. 컨설턴트" , description = "로그인 인증 정보 확인 API")
 public class ConsultantController {
 
     @GetMapping("/")
@@ -21,6 +24,7 @@ public class ConsultantController {
 
     @ResponseBody
     @GetMapping("/consultants/me")
+    @Operation(summary = "회원의 인증 정보 API")
     public ResponseEntity<Map<String, String>> getCurrentUser(Principal principal) {
         if (principal == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
